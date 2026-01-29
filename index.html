@@ -6,52 +6,104 @@
   <title>Trade Price List</title>
 
   <style>
-    body {
-      margin: 0;
-      padding: 18px;
+    body{
+      margin:0;
+      padding:18px;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background:#f5f5f5;
     }
 
-    h1 {
-      text-align: center;
-      margin: 10px 0 18px;
-      font-size: 32px;
-      font-weight: 700;
+    h1{
+      text-align:center;
+      margin:10px 0 18px;
+      font-size:34px;
+      font-weight:700;
     }
 
     /* ✅ ALWAYS 3 PER ROW (PC + PHONE) */
-    .gallery {
-      display: grid;
+    .gallery{
+      display:grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      max-width: 1200px;
-      margin: 0 auto;
+      gap:14px;
+      max-width:1200px;
+      margin:0 auto;
     }
 
-    /* IMAGE CARD */
-    .img-box {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      padding: 12px;
+    /* ✅ SQUARE CARD */
+    .img-box{
+      background:white;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 2px 10px rgba(0,0,0,0.08);
+      cursor:pointer;
+      transition: transform 0.15s ease;
     }
 
-    /* ✅ SHOW FULL IMAGE (NO CROPPING) */
-    .img-box img {
-      width: 100%;
-      height: 220px;
-      object-fit: contain; /* ✅ FULL IMAGE */
-      display: block;
-      background: white;
+    .img-box:hover{
+      transform: scale(1.02);
     }
 
-    /* slight size boost on bigger screens */
-    @media (min-width: 900px) {
-      .img-box img {
-        height: 260px;
-      }
+    /* ✅ TRUE SQUARE SHAPE */
+    .img-box img{
+      width:100%;
+      aspect-ratio: 1 / 1;      /* ✅ makes it square */
+      object-fit: cover;         /* ✅ fills square nicely */
+      display:block;
+      background:white;
+    }
+
+    /* ✅ FULL SCREEN ZOOM POPUP */
+    .modal{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.85);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:20px;
+    }
+
+    .modal.active{
+      display:flex;
+    }
+
+    .modal img{
+      max-width:95%;
+      max-height:95%;
+      border-radius:14px;
+      background:white;
+    }
+
+    .close-btn{
+      position:fixed;
+      top:18px;
+      right:18px;
+      font-size:32px;
+      color:white;
+      background:rgba(255,255,255,0.15);
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .close-btn:hover{
+      background:rgba(255,255,255,0.25);
+    }
+
+    .hint{
+      text-align:center;
+      margin-top:10px;
+      font-size:14px;
+      opacity:0.6;
     }
   </style>
 </head>
@@ -59,14 +111,44 @@
 <body>
 
   <h1>Trade Price List</h1>
-
   <div class="gallery" id="gallery"></div>
+  <div class="hint">Tap any image to zoom.</div>
+
+  <!-- ✅ MODAL -->
+  <div class="modal" id="modal">
+    <div class="close-btn" id="closeBtn">×</div>
+    <img id="modalImg" src="" alt="">
+  </div>
 
   <script>
     const gallery = document.getElementById("gallery");
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const closeBtn = document.getElementById("closeBtn");
 
-    // ✅ CHANGE THIS TO HOW MANY IMAGES YOU ACTUALLY HAVE
+    // ✅ CHANGE THIS IF YOU HAVE LESS / MORE
     const totalImages = 400;
+
+    function openModal(src){
+      modalImg.src = src;
+      modal.classList.add("active");
+    }
+
+    function closeModal(){
+      modal.classList.remove("active");
+      modalImg.src = "";
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (e) => {
+      if(e.target === modal) closeModal();
+    });
+
+    // ESC closes modal on PC
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeModal();
+    });
 
     for (let i = 1; i <= totalImages; i++) {
       const box = document.createElement("div");
@@ -77,10 +159,15 @@
       img.loading = "lazy";
       img.alt = "";
 
-      // ✅ HIDE BROKEN / EMPTY IMAGES (PLACEHOLDERS)
+      // ✅ hide missing images (no empty placeholders)
       img.onerror = () => {
         box.remove();
       };
+
+      // ✅ click to zoom
+      box.addEventListener("click", () => {
+        openModal(img.src);
+      });
 
       box.appendChild(img);
       gallery.appendChild(box);
