@@ -20,13 +20,25 @@
       font-weight:700;
     }
 
-    /* ✅ 3 per row on PC + phone */
+    /* ✅ PC = 3 per row */
     .gallery{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:16px;
       max-width:1300px;
       margin:0 auto;
+    }
+
+    /* ✅ PHONE = 2 per row (fixes tiny images) */
+    @media (max-width: 700px){
+      .gallery{
+        grid-template-columns: repeat(2, 1fr);
+        gap:12px;
+      }
+
+      h1{
+        font-size:30px;
+      }
     }
 
     .img-box{
@@ -37,20 +49,22 @@
       cursor:pointer;
     }
 
-    /* ✅ SHOW THE WHOLE IMAGE (INCLUDING TEXT) */
+    /* ✅ FULL IMAGE + TEXT */
     .img-box img{
       width:100%;
-      height:330px;          /* ✅ more height so text fits */
-      object-fit: contain;   /* ✅ FULL IMAGE visible */
+      height:330px;
+      object-fit: contain;
       display:block;
       background:white;
-      padding:10px;          /* ✅ makes it look cleaner */
+      padding:10px;
       box-sizing:border-box;
     }
 
-    @media (max-width: 650px){
+    /* ✅ smaller height on phone so cards look clean */
+    @media (max-width: 700px){
       .img-box img{
-        height:240px;
+        height:260px;
+        padding:8px;
       }
     }
 
@@ -106,7 +120,6 @@
 
   <div class="gallery" id="gallery"></div>
 
-  <!-- ✅ Modal -->
   <div class="modal" id="modal">
     <div class="close-btn" id="closeBtn">×</div>
     <img id="modalImg" src="" alt="">
